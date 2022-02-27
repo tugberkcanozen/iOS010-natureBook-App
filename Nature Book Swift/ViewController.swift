@@ -11,6 +11,8 @@ import CoreData
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var nameArray = [String]()
     var idArray = [UUID]()
+    var sourceName = ""
+    var sourceId: UUID?
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -74,11 +76,27 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     @objc func addItem() {
-        
+        sourceName = ""
         performSegue(withIdentifier: "toSecondVC", sender: nil)
         
     }
-
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "toSecondVC" {
+            let destinationVC = segue.destination as! ViewController2
+            destinationVC.targetName = sourceName
+            destinationVC.targetId = sourceId
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        sourceName = nameArray[indexPath.row]
+        sourceId = idArray[indexPath.row]
+        performSegue(withIdentifier: "toSecondVC", sender: nil)
+    }
 
 }
 

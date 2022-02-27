@@ -14,9 +14,54 @@ class ViewController2: UIViewController, UIImagePickerControllerDelegate, UINavi
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var placeTextField: UITextField!
     @IBOutlet weak var yearTextField: UITextField!
+    var targetName = ""
+    var targetId: UUID?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if targetName != "" {
+            // Core Data Verileri Buraya Gelecek
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+            let context = appDelegate.persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Gallery")
+            // Filtreleme
+            let idString = targetId?.uuidString // id aldık
+            fetchRequest.predicate = NSPredicate(format: "id = %@", idString!)
+            fetchRequest.returnsObjectsAsFaults = false
+            
+            do {
+                
+                let results = try context.fetch(fetchRequest)
+                for result in results as! [NSManagedObject] {
+                    
+                    if let name = result.value(forKey: "name") as? String {
+                        nameTextField.text = name
+                    }
+                    if let place = result.value(forKey: "place") as? String {
+                        placeTextField.text = place
+                    }
+                    if let year = result.value(forKey: "year") as? Int {
+                        yearTextField.text = String(year)
+                    }
+                    if let imageData = result.value(forKey: "image") as? Data {
+                        let image = UIImage(data: imageData)
+                        imageView.image = image
+                    }
+                   
+                    
+                }
+            
+            
+            } catch {
+                
+                print("error")
+            }
+            
+            
+        }else {
+            
+        }
 
         imageView.isUserInteractionEnabled = true
         let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTap))
