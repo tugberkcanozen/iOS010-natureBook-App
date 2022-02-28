@@ -30,7 +30,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        title = "Nature Book"
         navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.add, target: self, action: #selector(addItem))
         
         tableView.delegate = self
@@ -98,5 +98,38 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         performSegue(withIdentifier: "toSecondVC", sender: nil)
     }
 
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let context = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Gallery")
+        // Filtreleme
+        let idString = idArray[indexPath.row].uuidString // id aldık
+        fetchRequest.predicate = NSPredicate(format: "id = %@", idString)
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            for result in results as! [NSManagedObject] {
+                if let _ = result.value(forKey: "id") as? UUID {
+                    
+                    context.delete(result)
+                    nameArray.remove(at: indexPath.row)
+                    idArray.remove(at: indexPath.row)
+                    self.tableView.reloadData()
+                    
+                    do {
+                        try context.save()
+                    } catch {
+                        
+                    }
+                }
+            }
+        } catch {
+            
+        }
+        
+    }
+    
 }
 

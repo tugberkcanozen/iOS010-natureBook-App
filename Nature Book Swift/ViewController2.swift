@@ -21,6 +21,7 @@ class ViewController2: UIViewController, UIImagePickerControllerDelegate, UINavi
         super.viewDidLoad()
         
         if targetName != "" {
+            
             // Core Data Verileri Buraya Gelecek
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
             let context = appDelegate.persistentContainer.viewContext
